@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LetBrick - Oxford Rental Price Predictor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1a4b8c;
+            --secondary: #2b6cb0;
+            --accent: #ff6b35;
+            --light: #f5f7f9;
+            --dark: #2d3748;
+            --success: #48bb78;
+            --warning: #ecc94b;
+            --danger: #e53e3e;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            color: #333;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            padding-bottom: 2rem;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        
+        .hero {
+            background: linear-gradient(rgba(26, 75, 140, 0.85), rgba(43, 108, 176, 0.85));
+            color: white;
+            padding: 3rem 0;
+            border-radius: 0 0 15px 15px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 12px 12px 0 0 !important;
+            font-weight: 600;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 8px;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 0.25rem rgba(43, 108, 176, 0.25);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(26, 75, 140, 0.3);
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 1.5rem;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            color: var(--secondary);
+            margin-bottom: 1rem;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            color: var(--primary);
+        }
+        
+        .comparison-bar {
+            height: 8px;
+            border-radius: 4px;
+            background: #e9ecef;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+        
+        .comparison-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+        
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        
+        .property-badge {
+            display: inline-block;
+            padding: 0.35em 0.65em;
+            font-size: 0.75em;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 0.375rem;
+            background-color: var(--light);
+            color: var(--dark);
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .stat-number {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-home me-2"></i>LetBrick
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1 class="display-4 fw-bold mb-3">Oxford Rental Price Predictor</h1>
+            <p class="lead mb-4">Accurately estimate rental prices using our machine learning model trained on Oxford property data</p>
+            <div class="d-flex flex-wrap justify-content-center gap-2">
+                <span class="property-badge"><i class="fas fa-bed me-1"></i> Bedroom Analysis</span>
+                <span class="property-badge"><i class="fas fa-map-marker-alt me-1"></i> Location Intelligence</span>
+                <span class="property-badge"><i class="fas fa-chart-line me-1"></i> Market Trends</span>
+                <span class="property-badge"><i class="fas fa-ruler-combined me-1"></i> Size Matters</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="row">
+            <!-- Prediction Form -->
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0"><i class="fas fa-calculator me-2"></i>Rental Price Prediction</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="prediction-form">
+                            <div class="row mb-4">
+                                <div class="col-md-4">
+                                    <label class="form-label">Bedrooms</label>
+                                    <input type="number" class="form-control" name="bedrooms" value="2" min="0" max="10" required>
+                                    <div class="form-text">Number of bedrooms</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Bathrooms</label>
+                                    <input type="number" class="form-control" name="bathrooms" value="1" min="1" max="5" required>
+                                    <div class="form-text">Number of bathrooms</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Property Size (sq ft)</label>
+                                    <input type="number" class="form-control" name="squareft" value="700" min="200" max="5000" required>
+                                    <div class="form-text">Approximate square footage</div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label">Property Type</label>
+                                    <select class="form-select" name="property_type" required>
+                                        <option value="Flat">Flat/Apartment</option>
+                                        <option value="House">House</option>
+                                        <option value="Studio">Studio</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Postcode Area</label>
+                                    <select class="form-select" name="postcode_area" required>
+                                        <option value="OX1">OX1 (City Centre)</option>
+                                        <option value="OX2">OX2 (North Oxford)</option>
+                                        <option value="OX3">OX3 (Headington)</option>
+                                        <option value="OX4">OX4 (East Oxford)</option>
+                                        <option value="OX5">OX5 (Kidlington)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary btn-lg w-100 py-3" id="submit-btn">
+                                <i class="fas fa-bolt me-2"></i>Predict Rental Price
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Loading Indicator -->
+                <div class="loading card" id="loading">
+                    <div class="card-body text-center">
+                        <div class="spinner-border mb-3" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <h5>Analyzing property data...</h5>
+                        <p class="text-muted">This may take a few seconds</p>
+                    </div>
+                </div>
+                
+                <!-- Results Card -->
+                <div class="card" id="result" style="display: none;">
+                    <div class="card-header bg-success">
+                        <h3 class="mb-0 text-white"><i class="fas fa-check-circle me-2"></i>Prediction Result</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-4">
+                            <h2 id="prediction-range" class="text-success fw-bold"></h2>
+                            <p class="text-muted">Estimated monthly rent</p>
+                            
+                            <div class="comparison-bar mx-auto" style="max-width: 300px;">
+                                <div class="comparison-fill" id="comparison-bar" style="width: 65%;"></div>
+                            </div>
+                            <small class="text-muted">Compared to Oxford average: <span id="comparison-text"></span></small>
+                        </div>
+                        
+                        <hr>
+                        
+                        <h5 class="mb-3"><i class="fas fa-info-circle me-2"></i>Input Details</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-2">Bedrooms: <strong><span id="result-bedrooms"></span></strong></div>
+                            <div class="col-md-6 mb-2">Bathrooms: <strong><span id="result-bathrooms"></span></strong></div>
+                            <div class="col-md-6 mb-2">Square Footage: <strong><span id="result-squareft"></span> sq ft</strong></div>
+                            <div class="col-md-6 mb-2">Property Type: <strong><span id="result-property-type"></span></strong></div>
+                            <div class="col-md-6 mb-2">Postcode Area: <strong><span id="result-postcode"></span></strong></div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button class="btn btn-outline-primary me-2" id="save-btn">
+                                <i class="fas fa-save me-1"></i>Save Prediction
+                            </button>
+                            <button class="btn btn-outline-secondary" id="reset-btn">
+                                <i class="fas fa-redo me-1"></i>New Prediction
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Error Card -->
+                <div class="card" id="error" style="display: none;">
+                    <div class="card-header bg-danger text-white">
+                        <h3 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Error</h3>
+                    </div>
+                    <div class="card-body">
+                        <p id="error-message" class="text-center mb-0"></p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Market Insights Sidebar -->
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0"><i class="fas fa-chart-line me-2"></i>Market Insights</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="market-stats">
+                            <div class="text-center py-4">
+                                <div class="spinner-border text-primary mb-3" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p>Loading market data...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Prediction Tips</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex mb-3">
+                            <div class="feature-icon">
+                                <i class="fas fa-ruler-combined"></i>
+                            </div>
+                            <div class="ms-3">
+                                <h6>Size Matters</h6>
+                                <p class="small mb-0">Larger properties generally command higher rents. Square footage is a key factor in our prediction model.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex mb-3">
+                            <div class="feature-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="ms-3">
+                                <h6>Location Matters</h6>
+                                <p class="small mb-0">OX1 (City Centre) commands the highest rents due to proximity to universities and amenities.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex mb-3">
+                            <div class="feature-icon">
+                                <i class="fas fa-bed"></i>
+                            </div>
+                            <div class="ms-3">
+                                <h6>Bedroom Value</h6>
+                                <p class="small mb-0">Each additional bedroom typically adds £200-£300 to the monthly rent.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex">
+                            <div class="feature-icon">
+                                <i class="fas fa-home"></i>
+                            </div>
+                            <div class="ms-3">
+                                <h6>Property Types</h6>
+                                <p class="small mb-0">Houses generally rent for more than flats of similar size due to added privacy and outdoor space.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>LetBrick Rental Predictor</h5>
+                    <p>Using machine learning to accurately estimate rental prices in Oxford and beyond.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">© 2023 LetBrick | Data Science Project</p>
+                    <p class="small">Data sourced from Rightmove and OpenRent</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap & JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load market stats
+            loadMarketStats();
+            
+            // Form submission
+            const predictionForm = document.getElementById('prediction-form');
+            if (predictionForm) {
+                predictionForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const button = document.getElementById('submit-btn');
+                    const loading = document.getElementById('loading');
+                    const result = document.getElementById('result');
+                    const error = document.getElementById('error');
+                    
+                    // Hide previous results and show loading
+                    if (result) result.style.display = 'none';
+                    if (error) error.style.display = 'none';
+                    if (loading) loading.style.display = 'block';
+                    if (button) button.disabled = true;
+                    
+                    try {
+                        const formData = new FormData(this);
+                        const response = await fetch('/predict', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error('Server error: ' + response.status);
+                        }
+                        
+                        const data = await response.json();
+                        
+                        if (data.error) {
+                            throw new Error(data.error);
+                        }
+                        
+                        // Display results - safely check if elements exist
+                        const predictionRange = document.getElementById('prediction-range');
+                        const resultBedrooms = document.getElementById('result-bedrooms');
+                        const resultBathrooms = document.getElementById('result-bathrooms');
+                        const resultSquareft = document.getElementById('result-squareft');
+                        const resultPropertyType = document.getElementById('result-property-type');
+                        const resultPostcode = document.getElementById('result-postcode');
+                        const comparisonText = document.getElementById('comparison-text');
+                        const comparisonBar = document.getElementById('comparison-bar');
+                        
+                        if (predictionRange) predictionRange.textContent = data.range;
+                        if (resultBedrooms) resultBedrooms.textContent = data.bedrooms;
+                        if (resultBathrooms) resultBathrooms.textContent = data.bathrooms;
+                        if (resultSquareft) resultSquareft.textContent = data.squareft;
+                        if (resultPropertyType) resultPropertyType.textContent = data.property_type;
+                        if (resultPostcode) resultPostcode.textContent = data.postcode_area;
+                        if (comparisonText) comparisonText.textContent = data.comparison_text;
+                        if (comparisonBar) comparisonBar.style.width = data.comparison_width + "%";
+                        
+                        // Show result card
+                        if (loading) loading.style.display = 'none';
+                        if (result) result.style.display = 'block';
+                        
+                    } catch (error) {
+                        const errorMessage = document.getElementById('error-message');
+                        if (errorMessage) errorMessage.textContent = error.message;
+                        if (loading) loading.style.display = 'none';
+                        if (error) error.style.display = 'block';
+                        console.error('Error:', error);
+                    } finally {
+                        if (button) button.disabled = false;
+                    }
+                });
+            }
+            
+            // Reset button
+            const resetBtn = document.getElementById('reset-btn');
+            if (resetBtn) {
+                resetBtn.addEventListener('click', function() {
+                    const result = document.getElementById('result');
+                    const form = document.getElementById('prediction-form');
+                    if (result) result.style.display = 'none';
+                    if (form) form.reset();
+                });
+            }
+            
+            // Save button
+            const saveBtn = document.getElementById('save-btn');
+            if (saveBtn) {
+                saveBtn.addEventListener('click', function() {
+                    alert('Prediction saved! (This would connect to a database in a production app)');
+                });
+            }
+        });
+        
+        // Load market statistics
+        async function loadMarketStats() {
+            try {
+                const response = await fetch('/market-stats');
+                const data = await response.json();
+                
+                const marketStats = document.getElementById('market-stats');
+                if (marketStats) {
+                    marketStats.innerHTML = `
+                        <div class="row text-center">
+                            <div class="col-6 mb-3">
+                                <div class="stat-number">£${data.avg_rent}</div>
+                                <div class="stat-label">Avg Rent</div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <div class="stat-number">${data.total_properties}</div>
+                                <div class="stat-label">Properties</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="stat-number">${data.expensive_area}</div>
+                                <div class="stat-label">Priciest Area</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="stat-number">£${data.expensive_area_price}</div>
+                                <div class="stat-label">Avg Price There</div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <p class="small text-muted mb-0">Data updated: Today</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                const marketStats = document.getElementById('market-stats');
+                if (marketStats) {
+                    marketStats.innerHTML = `
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Market data temporarily unavailable
+                        </div>
+                    `;
+                }
+                console.error('Error loading market stats:', error);
+            }
+        }
+    </script>
+</body>
+</html>

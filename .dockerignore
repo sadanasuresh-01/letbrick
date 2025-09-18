@@ -1,0 +1,15 @@
+cat > .dockerignore << 'EOL'
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+.git
+.gitignore
+README.md
+Dockerfile
+.dockerignore
+EOL

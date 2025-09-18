@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: rental-predictor
+    env: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn main:app"  # Use Gunicorn for production instead of python
+    envVars:
+      - key: FLASK_ENV
+        value: production
