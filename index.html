@@ -182,7 +182,6 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
     <section class="hero">
         <div class="container">
             <h1 class="display-4 fw-bold mb-3">Oxford Rental Price Predictor</h1>
@@ -196,10 +195,9 @@
         </div>
     </section>
 
-    <!-- Main Content -->
     <div class="container">
         <div class="row">
-            <!-- Prediction Form -->
+
             <div class="col-lg-8">
                 <div class="card">
                     <div class="card-header">
@@ -253,7 +251,6 @@
                     </div>
                 </div>
                 
-                <!-- Loading Indicator -->
                 <div class="loading card" id="loading">
                     <div class="card-body text-center">
                         <div class="spinner-border mb-3" role="status">
@@ -263,8 +260,7 @@
                         <p class="text-muted">This may take a few seconds</p>
                     </div>
                 </div>
-                
-                <!-- Results Card -->
+
                 <div class="card" id="result" style="display: none;">
                     <div class="card-header bg-success">
                         <h3 class="mb-0 text-white"><i class="fas fa-check-circle me-2"></i>Prediction Result</h3>
@@ -302,7 +298,6 @@
                     </div>
                 </div>
                 
-                <!-- Error Card -->
                 <div class="card" id="error" style="display: none;">
                     <div class="card-header bg-danger text-white">
                         <h3 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Error</h3>
@@ -313,7 +308,6 @@
                 </div>
             </div>
             
-            <!-- Market Insights Sidebar -->
             <div class="col-lg-4">
                 <div class="card">
                     <div class="card-header">
@@ -321,11 +315,26 @@
                     </div>
                     <div class="card-body">
                         <div id="market-stats">
-                            <div class="text-center py-4">
-                                <div class="spinner-border text-primary mb-3" role="status">
-                                    <span class="visually-hidden">Loading...</span>
+                            <div class="row text-center">
+                                <div class="col-6 mb-3">
+                                    <div class="stat-number">£1,450</div>
+                                    <div class="stat-label">Avg Rent</div>
                                 </div>
-                                <p>Loading market data...</p>
+                                <div class="col-6 mb-3">
+                                    <div class="stat-number">2,347</div>
+                                    <div class="stat-label">Properties</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="stat-number">OX1</div>
+                                    <div class="stat-label">Priciest Area</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="stat-number">£1,850</div>
+                                    <div class="stat-label">Avg Price There</div>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <p class="small text-muted mb-0">Data updated: Today</p>
                             </div>
                         </div>
                     </div>
@@ -381,7 +390,6 @@
         </div>
     </div>
 
-    <!-- Footer -->
     <footer class="mt-5">
         <div class="container">
             <div class="row">
@@ -397,83 +405,81 @@
         </div>
     </footer>
 
-    <!-- Bootstrap & JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Load market stats
-            loadMarketStats();
+            // Replace the form submission handler with client-side prediction
+            document.getElementById('prediction-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Show loading state
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('result').style.display = 'none';
+                document.getElementById('error').style.display = 'none';
+                document.getElementById('submit-btn').disabled = true;
+                
+                // Simulate processing time
+                setTimeout(function() {
+                    // Get form values
+                    const bedrooms = parseInt(document.querySelector('[name="bedrooms"]').value);
+                    const bathrooms = parseInt(document.querySelector('[name="bathrooms"]').value);
+                    const squareft = parseInt(document.querySelector('[name="squareft"]').value);
+                    const property_type = document.querySelector('[name="property_type"]').value;
+                    const postcode_area = document.querySelector('[name="postcode_area"]').value;
+                    
+                    // Client-side prediction
+                    const prediction = predictRentClientSide(bedrooms, bathrooms, squareft, property_type, postcode_area);
+                    
+                    // Display results
+                    displayResults(prediction, bedrooms, bathrooms, squareft, property_type, postcode_area);
+                    
+                    // Hide loading state
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('submit-btn').disabled = false;
+                }, 1000);
+            });
             
-            // Form submission
-            const predictionForm = document.getElementById('prediction-form');
-            if (predictionForm) {
-                predictionForm.addEventListener('submit', async function(e) {
-                    e.preventDefault();
-                    
-                    const button = document.getElementById('submit-btn');
-                    const loading = document.getElementById('loading');
-                    const result = document.getElementById('result');
-                    const error = document.getElementById('error');
-                    
-                    // Hide previous results and show loading
-                    if (result) result.style.display = 'none';
-                    if (error) error.style.display = 'none';
-                    if (loading) loading.style.display = 'block';
-                    if (button) button.disabled = true;
-                    
-                    try {
-                        const formData = new FormData(this);
-                        const response = await fetch('/predict', {
-                            method: 'POST',
-                            body: formData
-                        });
-                        
-                        if (!response.ok) {
-                            throw new Error('Server error: ' + response.status);
-                        }
-                        
-                        const data = await response.json();
-                        
-                        if (data.error) {
-                            throw new Error(data.error);
-                        }
-                        
-                        // Display results - safely check if elements exist
-                        const predictionRange = document.getElementById('prediction-range');
-                        const resultBedrooms = document.getElementById('result-bedrooms');
-                        const resultBathrooms = document.getElementById('result-bathrooms');
-                        const resultSquareft = document.getElementById('result-squareft');
-                        const resultPropertyType = document.getElementById('result-property-type');
-                        const resultPostcode = document.getElementById('result-postcode');
-                        const comparisonText = document.getElementById('comparison-text');
-                        const comparisonBar = document.getElementById('comparison-bar');
-                        
-                        if (predictionRange) predictionRange.textContent = data.range;
-                        if (resultBedrooms) resultBedrooms.textContent = data.bedrooms;
-                        if (resultBathrooms) resultBathrooms.textContent = data.bathrooms;
-                        if (resultSquareft) resultSquareft.textContent = data.squareft;
-                        if (resultPropertyType) resultPropertyType.textContent = data.property_type;
-                        if (resultPostcode) resultPostcode.textContent = data.postcode_area;
-                        if (comparisonText) comparisonText.textContent = data.comparison_text;
-                        if (comparisonBar) comparisonBar.style.width = data.comparison_width + "%";
-                        
-                        // Show result card
-                        if (loading) loading.style.display = 'none';
-                        if (result) result.style.display = 'block';
-                        
-                    } catch (error) {
-                        const errorMessage = document.getElementById('error-message');
-                        if (errorMessage) errorMessage.textContent = error.message;
-                        if (loading) loading.style.display = 'none';
-                        if (error) error.style.display = 'block';
-                        console.error('Error:', error);
-                    } finally {
-                        if (button) button.disabled = false;
-                    }
-                });
+            function predictRentClientSide(bedrooms, bathrooms, squareft, property_type, postcode_area) {
+                // Copy the exact same logic from your Flask app
+                let base_price = 800;
+                let price = base_price + (bedrooms * 250) + (bathrooms * 100) + (squareft * 0.2);
+                
+                if (property_type == "House") {
+                    price += 200;
+                } else if (property_type == "Studio") {
+                    price -= 100;
+                }
+                
+                const postcode_adj = {"OX1": 200, "OX2": 150, "OX3": 100, "OX4": 50, "OX5": 0};
+                price += postcode_adj[postcode_area] || 0;
+                
+                return price;
             }
             
-            // Reset button
+            function displayResults(prediction, bedrooms, bathrooms, squareft, property_type, postcode_area) {
+                const lower_bound = Math.max(300, prediction - 200);
+                const upper_bound = prediction + 200;
+                
+                document.getElementById('prediction-range').textContent = `£${Math.round(lower_bound)} - £${Math.round(upper_bound)}`;
+                document.getElementById('result-bedrooms').textContent = bedrooms;
+                document.getElementById('result-bathrooms').textContent = bathrooms;
+                document.getElementById('result-squareft').textContent = squareft;
+                document.getElementById('result-property-type').textContent = property_type;
+                document.getElementById('result-postcode').textContent = postcode_area;
+                
+                // Calculate comparison to average
+                const oxford_avg = 1450;
+                const percentage = (prediction / oxford_avg) * 100;
+                const comparisonText = percentage > 100 ? 
+                    `${Math.round(percentage - 100)}% above average` : 
+                    `${Math.round(100 - percentage)}% below average`;
+                
+                document.getElementById('comparison-text').textContent = comparisonText;
+                document.getElementById('comparison-bar').style.width = `${Math.min(percentage, 100)}%`;
+                
+                document.getElementById('result').style.display = 'block';
+            }
+            
             const resetBtn = document.getElementById('reset-btn');
             if (resetBtn) {
                 resetBtn.addEventListener('click', function() {
@@ -484,7 +490,6 @@
                 });
             }
             
-            // Save button
             const saveBtn = document.getElementById('save-btn');
             if (saveBtn) {
                 saveBtn.addEventListener('click', function() {
@@ -492,52 +497,6 @@
                 });
             }
         });
-        
-        // Load market statistics
-        async function loadMarketStats() {
-            try {
-                const response = await fetch('/market-stats');
-                const data = await response.json();
-                
-                const marketStats = document.getElementById('market-stats');
-                if (marketStats) {
-                    marketStats.innerHTML = `
-                        <div class="row text-center">
-                            <div class="col-6 mb-3">
-                                <div class="stat-number">£${data.avg_rent}</div>
-                                <div class="stat-label">Avg Rent</div>
-                            </div>
-                            <div class="col-6 mb-3">
-                                <div class="stat-number">${data.total_properties}</div>
-                                <div class="stat-label">Properties</div>
-                            </div>
-                            <div class="col-6">
-                                <div class="stat-number">${data.expensive_area}</div>
-                                <div class="stat-label">Priciest Area</div>
-                            </div>
-                            <div class="col-6">
-                                <div class="stat-number">£${data.expensive_area_price}</div>
-                                <div class="stat-label">Avg Price There</div>
-                            </div>
-                        </div>
-                        <div class="mt-3">
-                            <p class="small text-muted mb-0">Data updated: Today</p>
-                        </div>
-                    `;
-                }
-            } catch (error) {
-                const marketStats = document.getElementById('market-stats');
-                if (marketStats) {
-                    marketStats.innerHTML = `
-                        <div class="alert alert-warning">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            Market data temporarily unavailable
-                        </div>
-                    `;
-                }
-                console.error('Error loading market stats:', error);
-            }
-        }
     </script>
 </body>
 </html>
