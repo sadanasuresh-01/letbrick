@@ -173,7 +173,7 @@
     </style>
 </head>
 <body>
-    <!-- Navigation -->
+
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
             <a class="navbar-brand" href="#">
@@ -408,39 +408,34 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Replace the form submission handler with client-side prediction
+
             document.getElementById('prediction-form').addEventListener('submit', function(e) {
                 e.preventDefault();
                 
-                // Show loading state
                 document.getElementById('loading').style.display = 'block';
                 document.getElementById('result').style.display = 'none';
                 document.getElementById('error').style.display = 'none';
                 document.getElementById('submit-btn').disabled = true;
                 
-                // Simulate processing time
                 setTimeout(function() {
-                    // Get form values
+
                     const bedrooms = parseInt(document.querySelector('[name="bedrooms"]').value);
                     const bathrooms = parseInt(document.querySelector('[name="bathrooms"]').value);
                     const squareft = parseInt(document.querySelector('[name="squareft"]').value);
                     const property_type = document.querySelector('[name="property_type"]').value;
                     const postcode_area = document.querySelector('[name="postcode_area"]').value;
-                    
-                    // Client-side prediction
+
                     const prediction = predictRentClientSide(bedrooms, bathrooms, squareft, property_type, postcode_area);
-                    
-                    // Display results
+
                     displayResults(prediction, bedrooms, bathrooms, squareft, property_type, postcode_area);
-                    
-                    // Hide loading state
+
                     document.getElementById('loading').style.display = 'none';
                     document.getElementById('submit-btn').disabled = false;
                 }, 1000);
             });
             
             function predictRentClientSide(bedrooms, bathrooms, squareft, property_type, postcode_area) {
-                // Copy the exact same logic from your Flask app
+
                 let base_price = 800;
                 let price = base_price + (bedrooms * 250) + (bathrooms * 100) + (squareft * 0.2);
                 
@@ -467,7 +462,6 @@
                 document.getElementById('result-property-type').textContent = property_type;
                 document.getElementById('result-postcode').textContent = postcode_area;
                 
-                // Calculate comparison to average
                 const oxford_avg = 1450;
                 const percentage = (prediction / oxford_avg) * 100;
                 const comparisonText = percentage > 100 ? 
@@ -500,3 +494,4 @@
     </script>
 </body>
 </html>
+
